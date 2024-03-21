@@ -44,8 +44,9 @@ ARG ERDDAP_CONTENT_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDD
 ARG ERDDAP_WAR_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDDAP_VERSION/erddap.war
 ENV ERDDAP_bigParentDirectory /erddapData
 
-RUN apt-get update && apt-get install -y unzip xmlstarlet \
+RUN apt-get update && apt-get install -y less python3-lxml unzip vim-tiny xmlstarlet \
     && if ! command -v gosu &> /dev/null; then apt-get install -y gosu; fi \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3 3 \
     && rm -rf /var/lib/apt/lists/*
 
 ARG BUST_CACHE=1
@@ -79,15 +80,15 @@ ENV ERDDAP_baseHttpsUrl="https://localhost:8443" \
     ERDDAP_emailProperties="" \
     ERDDAP_emailSmtpHost="" \
     ERDDAP_emailSmtpPort="" \
-    ERDDAP_adminInstitution="Axiom Docker Install" \
-    ERDDAP_adminInstitutionUrl="https://github.com/axiom-data-science/docker-erddap" \
-    ERDDAP_adminIndividualName="Axiom Docker Install" \
+    ERDDAP_adminInstitution="UW FAR Lab Install" \
+    ERDDAP_adminInstitutionUrl="https://github.com/uw-farlab/docker-erddap" \
+    ERDDAP_adminIndividualName="UW FAR Lab Install" \
     ERDDAP_adminPosition="Software Engineer" \
     ERDDAP_adminPhone="555-555-5555" \
     ERDDAP_adminAddress="123 Irrelevant St." \
     ERDDAP_adminCity="Nowhere" \
-    ERDDAP_adminStateOrProvince="AK" \
-    ERDDAP_adminPostalCode="99504" \
+    ERDDAP_adminStateOrProvince="WA" \
+    ERDDAP_adminPostalCode="98195" \
     ERDDAP_adminCountry="USA" \
     ERDDAP_adminEmail="nobody@example.com"
 
@@ -96,3 +97,6 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
+
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl --fail 'http://localhost:8080/erddap/index.html' || exit 1
