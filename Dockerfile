@@ -1,6 +1,6 @@
-ARG BASE_IMAGE=tomcat:10.1.19-jdk17-temurin-jammy
+ARG BASE_IMAGE=tomcat:10.1.24-jdk17-temurin-jammy
 #referencing a specific image digest pins our unidata tomcat-docker image to platform amd64 (good)
-ARG UNIDATA_TOMCAT_IMAGE=unidata/tomcat-docker:10-jdk17@sha256:af7d3fecec753cbd438f25881deeaf48b40ac1f105971d6f300252e104e39fb2
+ARG UNIDATA_TOMCAT_IMAGE=unidata/tomcat-docker:10-jdk17@sha256:bc2feea0a81b0a3b880c99bb73e583583fdc99b2555d247c3711e3f7ca1e821d
 FROM ${UNIDATA_TOMCAT_IMAGE} as unidata-tomcat-image
 FROM ${BASE_IMAGE}
 
@@ -9,9 +9,10 @@ FROM ${BASE_IMAGE}
 #flexibility in building images using different tomcat base images, architectures, etc
 RUN apt-get update && \
     apt-get install -y --no-install-recommends  \
+        file \
         gosu \
-        zip \
         unzip \
+        zip \
         && \
     # Cleanup
     apt-get clean && \
@@ -44,7 +45,7 @@ ARG ERDDAP_CONTENT_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDD
 ARG ERDDAP_WAR_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDDAP_VERSION/erddap.war
 ENV ERDDAP_bigParentDirectory /erddapData
 
-RUN apt-get update && apt-get install -y less python3-lxml unzip vim-tiny xmlstarlet \
+RUN apt-get update && apt-get install -y file less python3-lxml unzip vim-tiny xmlstarlet \
     && if ! command -v gosu &> /dev/null; then apt-get install -y gosu; fi \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3 3 \
     && rm -rf /var/lib/apt/lists/*
@@ -71,7 +72,8 @@ RUN /opt/update-server-xml.sh
 # Default configuration
 # Note: Make sure ERDDAP_flagKeyKey is set either in a runtime environment variable or in setup.xml
 #       If a value is not set, a random value for ERDDAP_flagKeyKey will be generated at runtime.
-ENV ERDDAP_baseHttpsUrl="https://localhost:8443" \
+ENV ERDDAP_baseUrl="http://localhost:8080" \
+    ERDDAP_baseHttpsUrl="http://localhost:8080" \
     ERDDAP_emailEverythingTo="nobody@example.com" \
     ERDDAP_emailDailyReportsTo="nobody@example.com" \
     ERDDAP_emailFromAddress="nothing@example.com" \
