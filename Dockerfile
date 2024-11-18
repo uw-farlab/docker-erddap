@@ -42,6 +42,7 @@ COPY --from=unidata-tomcat-image ${CATALINA_HOME}/conf/server.xml ${CATALINA_HOM
 
 ARG ERDDAP_VERSION=2.24
 ARG ERDDAP_CONTENT_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDDAP_VERSION/erddapContent.zip
+ARG ERDDAP_VERSION=2.25.1
 ARG ERDDAP_WAR_URL=https://github.com/ERDDAP/erddap/releases/download/v$ERDDAP_VERSION/erddap.war
 ENV ERDDAP_bigParentDirectory /erddapData
 
