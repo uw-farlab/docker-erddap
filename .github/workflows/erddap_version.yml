@@ -11,13 +11,13 @@ on:
 jobs:
   version:
     name: Check the current ERDDAP version
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
     if: github.repository == 'axiom-data-science/docker-erddap'
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Get ERDDAP versions, and create an issue if it is out of date
       uses: actions/github-script@v3
@@ -25,12 +25,12 @@ jobs:
         script: |
           const repo_name = "docker-erddap"
           const repo_owner = "axiom-data-science"
-          const assign_user = "kwilcox"
+          const assign_user = "srstsavage"
 
           const fs = require("fs")
 
           const release = await github.repos.getLatestRelease({
-            owner: "BobSimons",
+            owner: "ERDDAP",
             repo: "erddap"
           })
           const tag = release.data.tag_name
@@ -38,15 +38,15 @@ jobs:
           const dockerfile = fs.readFileSync(`${process.env.GITHUB_WORKSPACE}/Dockerfile`, "utf-8")
           const lines = dockerfile.split("\n")
           const docker_version_line = lines.find(line => line.includes("ERDDAP_VERSION"))
-          const docker_version = `v${docker_version_line.split(" ")[2]}`
+          const docker_version = `v${docker_version_line.split("=")[1]}`
 
           if (tag === docker_version) {
-            console.log(`Latest Docker version (${docker_version}) matches the latest available BobSimmons/erddap release`)
+            console.log(`Latest Docker version (${docker_version}) matches the latest available ERDDAP/erddap release`)
 
             return
           }
 
-          console.log(`Latest Docker version (${docker_version}) does not match the latest available BobSimmons/erddap release (${tag})`)
+          console.log(`Latest Docker version (${docker_version}) does not match the latest available ERDDAP/erddap release (${tag})`)
 
           const query = `query($owner: String!, $name: String!) { 
             repository(owner: $owner, name: $name) {
